@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<sub-flow name="sub-get-patient" doc:id="7fe7e9d9-b4f5-4176-b70b-42808a21ebae" >
+		<db:select doc:name="Retrieve patient" doc:id="6bd84315-b3d0-4b57-8db1-5a9085ad0e1d" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM patients WHERE external_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'id': vars.id}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-empty-collection doc:name="Retrived patient is not empty" doc:id="599e50f2-57be-42e2-920b-cc3afb4c9f26" >
+			<error-mapping sourceType="VALIDATION:EMPTY_COLLECTION" targetType="PATIENT:NOT_FOUND" />
+		</validation:is-not-empty-collection>
+	</sub-flow>
+</mule>
