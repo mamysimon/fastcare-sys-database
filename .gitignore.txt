@@ -1,9 +1,0 @@
-target/
-bin/
-.metadata/
-.classpath
-.project
-.settings/
-*.log
-*.tmp
-.DS_Store
