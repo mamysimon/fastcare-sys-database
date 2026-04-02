@@ -35,6 +35,7 @@
         <set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="ddf8605b-82af-4091-bc42-4f8157cfa0bc" variableName="patientId" />
         <set-variable value="#[payload]" doc:name="[consultation]" doc:id="15b784a2-f79d-4da4-92d2-cb6767408f15" variableName="consultation" />
         <flow-ref doc:name="sub-add-consultation" doc:id="8f3fc8fd-eaa0-49a9-a827-a956488bff8b" name="sub-add-consultation" />
+		<set-payload value="#[null]" doc:name="null" doc:id="26f0f02f-f8f1-479a-a0f4-c22d5056bf9f" />
     </flow>
     <flow name="get:\patients\(id):sys-database-api-config">
         <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId" />

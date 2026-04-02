@@ -15,18 +15,18 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 	<sub-flow name="sub-add-consultation" doc:id="5991243e-4e2f-4993-8db9-02c0a22cced7">
 		<flow-ref doc:name="Patient exists" doc:id="94ceb294-0c33-4547-bc53-0cf022299a0b" name="sub-get-patient" />
 		<flow-ref doc:name="sub-check-prescriptions-allergens" doc:id="bab941e6-b1e1-407e-8842-36c93147b081" name="sub-check-prescriptions-allergens"/>
-		<db:insert doc:name="Insert" doc:id="f86855e8-0af0-4399-b15a-6ad775937e8f" config-ref="Database_Config">
-			<db:sql ><![CDATA[INSERT INTO medical_records (patient_id, practitioner_name, visit_date, reason_for_visit, clinical_notes, prescriptions_list, blood_pressure, temperature)
+		<db:insert doc:name="Add consultation" doc:id="f86855e8-0af0-4399-b15a-6ad775937e8f" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO consultations (patient_reference, practitioner_name, visit_date, reason_for_visit, clinical_notes, prescriptions_list, blood_pressure, temperature)
 VALUES (:patientId, :practioner, :date, :reason, :notes, :prescription, :bloodPressure, :temperature)]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
-    patientId: vars.patientId as Number,
+    patientId: vars.patientId,
     practioner: vars.consultation.practitionerName,
-    date: vars.consultation.visitDate as DateTime,
+    date: vars.consultation.visitDate as DateTime as LocalDateTime,
     reason: vars.consultation.reasonForVisit,
     notes: vars.consultation.clinicalNotes,
-    prescription: vars.consultation.prescriptionsList,
-    bloodPressure: vars.consultation.bloodPressure,
-    temperature: vars.consultation.temperature
+    prescription: vars.consultation.prescriptionsList default null,
+    bloodPressure: vars.consultation.bloodPressure default null,
+    temperature: vars.consultation.temperature default null
 }]]]></db:input-parameters>
 		</db:insert>
 	</sub-flow>
@@ -77,6 +77,7 @@ VALUES (:patientId, :practioner, :date, :reason, :notes, :prescription, :bloodPr
 				<ee:set-payload resource="modules/AllergyConflict.dwl" />
 			</ee:message>
 		</ee:transform>
+		<logger level="DEBUG" doc:name='Debug patient allergies conflict"' doc:id="6e422856-904f-4080-8f05-aa5440ea807f" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug patient allergies conflict",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	allergyConflict: payload&#10;        }&#10;    }&#10;}]' category="${app.name}"/>
 		<validation:is-false doc:name="Is false" doc:id="c4b24346-8ac6-4e59-b99b-18c248873cf6" expression="#[ payload ]">
 			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="PATIENT:BAD_REQUEST" />
 		</validation:is-false>
