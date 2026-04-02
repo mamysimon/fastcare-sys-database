@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_180492b2_9310_453a_b0d1_e68c00b8055e_Output_Variables_allergies = Array<{|  id: Number,   created_at: Date,   external_id: String,   full_name?: String,   gender_code?: String,   dob_row?: String,   phone_number?: String,   email_address?: String,   address_line?: String,   zip_code?: String,   city?: String,   insurance_name?: String,   insurance_number?: String,   emergency_contact_full_name?: String,   emergency_contact_number?: String,   emergency_contact_relation?: String,   google_refresh_token?: String|}>
+

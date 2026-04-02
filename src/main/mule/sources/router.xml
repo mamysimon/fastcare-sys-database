@@ -53,28 +53,11 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="get:\patients\(id):sys-database-api-config">
-        <set-variable value="#[attributes.uriParams.id]" doc:name="[id]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="id"/>
+        <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId"/>
 		<flow-ref doc:name="sub-get-patient" doc:id="bc5e79df-e9a7-4209-8b28-2b4df197d246" name="sub-get-patient"/>
     </flow>
     <flow name="get:\records\(patientId):sys-database-api-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:variables>
-                <ee:set-variable variableName="patientId">attributes.uriParams.'patientId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform doc:name="Transform Message">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  correlationId: "fe5zef1-194b-475c-8dee-0zef56zf4180",
-  statusCode: 404,
-  namespace: "RESOURCE_NAME",
-  identifier: "NOT_FOUND",
-  description: "record not found with id xxx"
-} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="4f874388-d6d9-41f7-90d8-1e8e7b9d3f26" variableName="patientId" />
+		<flow-ref doc:name="sub-get-record" doc:id="c655a4eb-db6d-49e8-8e96-cb850f6ced3c" name="sub-get-medical-record"/>
     </flow>
 </mule>
