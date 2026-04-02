@@ -10,6 +10,8 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 			<db:sql ><![CDATA[SELECT * FROM patients WHERE external_id = :id]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{'id': vars.id}]]]></db:input-parameters>
 		</db:select>
+		<logger level="INFO" doc:name="After retrieve patient" doc:id="899fd3e6-5b98-4a49-9c9e-514afcb48ffb" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve patient",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.id,&#10;        	patientCount: sizeOf(payload)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}"/>
+		<logger level="DEBUG" doc:name="Debug retrieve patient" doc:id="9e30e91c-086b-4e5c-b21b-2e4f70dac159" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve patient",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	patient: payload[0]&#10;        }&#10;    }&#10;}]' category="${app.name}"/>
 		<validation:is-not-empty-collection doc:name="Retrived patient is not empty" doc:id="599e50f2-57be-42e2-920b-cc3afb4c9f26" >
 			<error-mapping sourceType="VALIDATION:EMPTY_COLLECTION" targetType="PATIENT:NOT_FOUND" />
 		</validation:is-not-empty-collection>
