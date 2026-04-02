@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_a1016c32_3e82_474c_979e_cc63933c3c02_Input_Variables_patientId = Null
+

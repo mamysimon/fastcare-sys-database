@@ -32,25 +32,9 @@
         <logger level="INFO" doc:name="End" doc:id="11455ec0-6264-4825-9ad2-7512e8a87761" category="${app.name}" message="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;{&#xA;    step: vars.metadata.endStep,&#xA;    data: {&#xA;        business: {},&#xA;        technical: payload - &quot;data&quot;&#xA;    }&#xA;}]" />
     </flow>
     <flow name="put:\records\(patientId):application\json:sys-database-api-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:variables>
-                <ee:set-variable variableName="patientId">attributes.uriParams.'patientId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform doc:name="Transform Message">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  correlationId: "fe5zef1-194b-475c-8dee-0zef56zf4180",
-  statusCode: 400,
-  namespace: "APIKIT",
-  identifier: "BAD_REQUEST",
-  description: "Field xxx is missing"
-} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="ddf8605b-82af-4091-bc42-4f8157cfa0bc" variableName="patientId" />
+		<set-variable value="#[payload]" doc:name="[consultation]" doc:id="15b784a2-f79d-4da4-92d2-cb6767408f15" variableName="consultation"/>
+		<flow-ref doc:name="sub-add-consultation" doc:id="8f3fc8fd-eaa0-49a9-a827-a956488bff8b" name="sub-add-consultation"/>
     </flow>
     <flow name="get:\patients\(id):sys-database-api-config">
         <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId"/>

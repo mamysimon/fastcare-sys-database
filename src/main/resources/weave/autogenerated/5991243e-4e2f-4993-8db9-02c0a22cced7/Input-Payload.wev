@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_5991243e_4e2f_4993_8db9_02c0a22cced7_Input_Payload = {
+  dateTime: String, 
+  data?: Any, 
+  correlationId: String, 
+  message: String, 
+  statusCode: Number, 
+  _?: Any
+}
+
