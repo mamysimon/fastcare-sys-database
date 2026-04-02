@@ -32,16 +32,16 @@
         <logger level="INFO" doc:name="End" doc:id="11455ec0-6264-4825-9ad2-7512e8a87761" category="${app.name}" message="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;{&#xA;    step: vars.metadata.endStep,&#xA;    data: {&#xA;        business: {},&#xA;        technical: payload - &quot;data&quot;&#xA;    }&#xA;}]" />
     </flow>
     <flow name="put:\records\(patientId):application\json:sys-database-api-config">
-		<set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="ddf8605b-82af-4091-bc42-4f8157cfa0bc" variableName="patientId" />
-		<set-variable value="#[payload]" doc:name="[consultation]" doc:id="15b784a2-f79d-4da4-92d2-cb6767408f15" variableName="consultation"/>
-		<flow-ref doc:name="sub-add-consultation" doc:id="8f3fc8fd-eaa0-49a9-a827-a956488bff8b" name="sub-add-consultation"/>
+        <set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="ddf8605b-82af-4091-bc42-4f8157cfa0bc" variableName="patientId" />
+        <set-variable value="#[payload]" doc:name="[consultation]" doc:id="15b784a2-f79d-4da4-92d2-cb6767408f15" variableName="consultation" />
+        <flow-ref doc:name="sub-add-consultation" doc:id="8f3fc8fd-eaa0-49a9-a827-a956488bff8b" name="sub-add-consultation" />
     </flow>
     <flow name="get:\patients\(id):sys-database-api-config">
-        <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId"/>
-		<flow-ref doc:name="sub-get-patient" doc:id="bc5e79df-e9a7-4209-8b28-2b4df197d246" name="sub-get-patient"/>
+        <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId" />
+        <flow-ref doc:name="sub-get-patient" doc:id="bc5e79df-e9a7-4209-8b28-2b4df197d246" name="sub-get-patient" />
     </flow>
     <flow name="get:\records\(patientId):sys-database-api-config">
-		<set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="4f874388-d6d9-41f7-90d8-1e8e7b9d3f26" variableName="patientId" />
-		<flow-ref doc:name="sub-get-record" doc:id="c655a4eb-db6d-49e8-8e96-cb850f6ced3c" name="sub-get-medical-record"/>
+        <set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="4f874388-d6d9-41f7-90d8-1e8e7b9d3f26" variableName="patientId" />
+        <flow-ref doc:name="sub-get-record" doc:id="c655a4eb-db6d-49e8-8e96-cb850f6ced3c" name="sub-get-medical-record" />
     </flow>
 </mule>

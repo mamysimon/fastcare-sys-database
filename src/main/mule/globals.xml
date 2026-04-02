@@ -1,71 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
-	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
-	<http:listener-config
-		name="sys-database-api-httpListenerConfig" basePath="${application.base-path}">
-		<http:listener-connection host="0.0.0.0"
-			port="${https.port}" />
-	</http:listener-config>
-	<apikit:config name="sys-database-api-config"
-		api="resource::43c948fb-024c-4176-a702-879840dedb82:database-system-api:1.0.4:raml:zip:database-system-api.raml"
-		outboundHeadersMapName="outboundHeaders"
-		httpStatusVarName="httpStatus" queryParamsStrictValidation="true"/>
-	<configuration-properties
-		doc:name="Configuration common properties"
-		doc:id="33c029f3-7ef6-4940-9415-818e44cf94ea"
-		file="properties/common-properties.yaml" />
-	<configuration-properties
-		doc:name="Configuration properties"
-		doc:id="a627d6e9-4446-4ab1-b556-586aacd7e204"
-		file="properties/${mule.env}-properties.yaml" />
-	<secure-properties:config
-		name="Secure_Properties_Config" doc:name="Secure Properties Config"
-		doc:id="1fc53cbb-8f21-4945-8d9f-46178cd0b867"
-		file="properties/secure/${mule.env}-properties.yaml"
-		key="${mule.encryptionKey}" />
-	<api-gateway:autodiscovery apiId="${autodiscoveryId}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="b5c8f22a-bc10-4b25-8eb9-90ffbda087f3" flowRef="sys-database-api-main" />
-	<configuration doc:name="Configuration" doc:id="f57341c7-fbe5-4815-936d-34cdd39254e9" defaultErrorHandler-ref="globalsError_Handler" />
-	<db:config name="Database_Config" doc:name="Database Config" doc:id="725c5caf-a0c5-431d-82c6-a8ea364a112f" >
-		<db:generic-connection url="jdbc:postgresql://${db.host}:${db.port}/${db.database}" user="${db.user}" password="${secure::db.password}" driverClassName="org.postgresql.Driver"/>
-	</db:config>
-	<global-property doc:name="Global Property" doc:id="bc4e5da8-464e-4e5a-8bd2-09181ee67f14" name="mule.env" value="loc" />
-	<global-property doc:name="Global Property" doc:id="0b8c0897-1776-4fad-a209-a14f204c1006" name="mule.encryptionKey" value="fastcarelocalkey" />
-	<sub-flow name="genericError" doc:id="924dcda8-a5cf-46d3-b12f-a585751fea50" >
-		<set-variable value='#[error.errorType.identifier match {&#10;  case "BAD_REQUEST"            -&gt; 400&#10;  case "UNAUTHORIZED"           -&gt; 401&#10;  case "FORBIDDEN"              -&gt; 403&#10;  case "NOT_FOUND"              -&gt; 404&#10;  case "METHOD_NOT_ALLOWED"     -&gt; 405&#10;  case "NOT_ACCEPTABLE"         -&gt; 406&#10;  case "CONFLICT"                -&gt; 409&#10;  case "UNSUPPORTED_MEDIA_TYPE" -&gt; 415&#10;  case "NOT_IMPLEMENTED"        -&gt; 501&#10;  else                          -&gt; error.errorMessage.attributes.statusCode default vars.httpStatus default 500&#10;}]' doc:name="[httpStatus]" doc:id="4166b7c9-1ee6-4b75-9170-df4821512c8c" variableName="httpStatus"/>
-		<ee:transform doc:name="Standard Error" doc:id="dd9dbbd1-1fd1-4607-b841-941fb8f9fe8a" >
-			<ee:message >
-				<ee:set-payload resource="modules/StandardError.dwl" />
-			</ee:message>
-		</ee:transform>
-		<logger level="ERROR" doc:name="ERROR" doc:id="a0833285-47dc-4907-a6cb-34855ee4c7dd" message='#[{&#10;	step: "Global error handler",&#10;	data: {&#10;		business: {},&#10;		technical: payload&#10;	}&#10;}]' category="${app.name}"/>
-	</sub-flow>
-	<error-handler name="globalsError_Handler" doc:id="4e6c82c1-1022-4ce4-a607-fcd5f16f1aa5" >
-		<!-- [STUDIO:"custom error"]<on-error-propagate enableNotifications="true" logException="true" doc:name="custom error" doc:id="caf48a9d-1676-4070-90f5-0037e83c959f" type="CUSTOM:ERROR">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <http:listener-config name="sys-database-api-httpListenerConfig" basePath="${application.base-path}">
+        <http:listener-connection host="0.0.0.0" port="${https.port}" />
+    </http:listener-config>
+    <apikit:config name="sys-database-api-config" api="resource::43c948fb-024c-4176-a702-879840dedb82:database-system-api:1.0.5:raml:zip:database-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" queryParamsStrictValidation="true" />
+    <configuration-properties doc:name="Configuration common properties" doc:id="33c029f3-7ef6-4940-9415-818e44cf94ea" file="properties/common-properties.yaml" />
+    <configuration-properties doc:name="Configuration properties" doc:id="a627d6e9-4446-4ab1-b556-586aacd7e204" file="properties/${mule.env}-properties.yaml" />
+    <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="1fc53cbb-8f21-4945-8d9f-46178cd0b867" file="properties/secure/${mule.env}-properties.yaml" key="${mule.encryptionKey}" />
+    <api-gateway:autodiscovery apiId="${autodiscoveryId}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="b5c8f22a-bc10-4b25-8eb9-90ffbda087f3" flowRef="sys-database-api-main" />
+    <configuration doc:name="Configuration" doc:id="f57341c7-fbe5-4815-936d-34cdd39254e9" defaultErrorHandler-ref="globalsError_Handler" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="725c5caf-a0c5-431d-82c6-a8ea364a112f">
+        <db:generic-connection url="jdbc:postgresql://${db.host}:${db.port}/${db.database}" user="${db.user}" password="${secure::db.password}" driverClassName="org.postgresql.Driver" />
+    </db:config>
+    <global-property doc:name="Global Property" doc:id="bc4e5da8-464e-4e5a-8bd2-09181ee67f14" name="mule.env" value="loc" />
+    <global-property doc:name="Global Property" doc:id="0b8c0897-1776-4fad-a209-a14f204c1006" name="mule.encryptionKey" value="fastcarelocalkey" />
+    <sub-flow name="genericError" doc:id="924dcda8-a5cf-46d3-b12f-a585751fea50">
+        <set-variable value="#[error.errorType.identifier match {&#xA;  case &quot;BAD_REQUEST&quot;            -&gt; 400&#xA;  case &quot;UNAUTHORIZED&quot;           -&gt; 401&#xA;  case &quot;FORBIDDEN&quot;              -&gt; 403&#xA;  case &quot;NOT_FOUND&quot;              -&gt; 404&#xA;  case &quot;METHOD_NOT_ALLOWED&quot;     -&gt; 405&#xA;  case &quot;NOT_ACCEPTABLE&quot;         -&gt; 406&#xA;  case &quot;CONFLICT&quot;                -&gt; 409&#xA;  case &quot;UNSUPPORTED_MEDIA_TYPE&quot; -&gt; 415&#xA;  case &quot;NOT_IMPLEMENTED&quot;        -&gt; 501&#xA;  else                          -&gt; error.errorMessage.attributes.statusCode default vars.httpStatus default 500&#xA;}]" doc:name="[httpStatus]" doc:id="4166b7c9-1ee6-4b75-9170-df4821512c8c" variableName="httpStatus" />
+        <ee:transform doc:name="Standard Error" doc:id="dd9dbbd1-1fd1-4607-b841-941fb8f9fe8a">
+            <ee:message>
+                <ee:set-payload resource="modules/StandardError.dwl" />
+            </ee:message>
+        </ee:transform>
+        <logger level="ERROR" doc:name="ERROR" doc:id="a0833285-47dc-4907-a6cb-34855ee4c7dd" message="#[{&#xA; step: &quot;Global error handler&quot;,&#xA; data: {&#xA;  business: {},&#xA;  technical: payload&#xA; }&#xA;}]" category="${app.name}" />
+    </sub-flow>
+    <error-handler name="globalsError_Handler" doc:id="4e6c82c1-1022-4ce4-a607-fcd5f16f1aa5">
+        <!-- [STUDIO:"custom error"]<on-error-propagate enableNotifications="true" logException="true" doc:name="custom error" doc:id="caf48a9d-1676-4070-90f5-0037e83c959f" type="CUSTOM:ERROR">
 			<set-variable value="Set custom description here" doc:name="[description&#93;" doc:id="9f3795ff-423b-4099-90eb-0d90bbc59ab6" variableName="description"/>
 			<set-variable value="999" doc:name="[httpStatus&#93;" doc:id="a7cf9546-fdce-457e-ac00-43491bf349e8" variableName="httpStatus"/>
 			<flow-ref doc:name="genericError" doc:id="fbd47efc-711d-4dbe-8f51-2ea757bdf377" name="genericError"/>
 		</on-error-propagate> [STUDIO] -->
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="patient not found" doc:id="c0908d6e-3289-48cf-a0cf-95937cc0be7e" type="PATIENT:NOT_FOUND">
-			<set-variable value='#["Patient with id $(vars.patientId) not found"]' doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
-			<set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />
-			<flow-ref doc:name="genericError" doc:id="c002c344-1a78-47dd-86aa-8df3c803169a" name="genericError" />
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="patient not found" doc:id="c0908d6e-3289-48cf-a0cf-95937cc0be7e" type="PATIENT:NOT_FOUND">
+            <set-variable value="#[&quot;Patient with id $(vars.patientId) not found&quot;]" doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
+            <set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />
+            <flow-ref doc:name="genericError" doc:id="c002c344-1a78-47dd-86aa-8df3c803169a" name="genericError" />
+        </on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="patient is allergic to prescription" doc:id="0600008f-ed2b-45a9-9b5e-a6c8620c037b" type="PATIENT:BAD_REQUEST">
+			<set-variable value="#[&quot;The prescriptions do not match the patient's allergies&quot;]" doc:name="[description]" doc:id="fa6bb291-2a11-42e1-be3e-4ac4055c9341" variableName="description" />
+			<set-variable value="400" doc:name="[httpStatus]" doc:id="12a23b53-9bab-443b-b01f-494afbdfd085" variableName="httpStatus" />
+			<flow-ref doc:name="genericError" doc:id="1b8aecc4-82d6-4311-8fbd-9caa256b3142" name="genericError" />
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1647bce7-4967-4420-bb1b-91170148787d">
-			<flow-ref doc:name="genericError" doc:id="71506bee-a65b-44f6-9761-ed1c88dbc8cd" name="genericError" />
-		</on-error-propagate>
-	</error-handler>
-
+            <flow-ref doc:name="genericError" doc:id="71506bee-a65b-44f6-9761-ed1c88dbc8cd" name="genericError" />
+        </on-error-propagate>
+    </error-handler>
 </mule>

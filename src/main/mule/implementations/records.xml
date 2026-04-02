@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<sub-flow name="sub-get-medical-record" doc:id="ac17df21-4213-450a-a64a-d5ff6364ae84" >
 		<flow-ref doc:name="Patient exists" doc:id="5dab2be4-cc0f-4686-9f5e-4bed6b87e9c8" name="sub-get-patient"/>
 		<flow-ref doc:name="sub-retrieve-patient-consultations" doc:id="7c8b580e-d685-4758-af47-b5106c65cf58" name="sub-retrieve-patient-consultations"/>
@@ -14,6 +15,20 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<sub-flow name="sub-add-consultation" doc:id="5991243e-4e2f-4993-8db9-02c0a22cced7">
 		<flow-ref doc:name="Patient exists" doc:id="94ceb294-0c33-4547-bc53-0cf022299a0b" name="sub-get-patient" />
 		<flow-ref doc:name="sub-check-prescriptions-allergens" doc:id="bab941e6-b1e1-407e-8842-36c93147b081" name="sub-check-prescriptions-allergens"/>
+		<db:insert doc:name="Insert" doc:id="f86855e8-0af0-4399-b15a-6ad775937e8f" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO medical_records (patient_id, practitioner_name, visit_date, reason_for_visit, clinical_notes, prescriptions_list, blood_pressure, temperature)
+VALUES (:patientId, :practioner, :date, :reason, :notes, :prescription, :bloodPressure, :temperature)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+    patientId: vars.patientId as Number,
+    practioner: vars.consultation.practitionerName,
+    date: vars.consultation.visitDate as DateTime,
+    reason: vars.consultation.reasonForVisit,
+    notes: vars.consultation.clinicalNotes,
+    prescription: vars.consultation.prescriptionsList,
+    bloodPressure: vars.consultation.bloodPressure,
+    temperature: vars.consultation.temperature
+}]]]></db:input-parameters>
+		</db:insert>
 	</sub-flow>
 	<sub-flow name="sub-retrieve-patient-consultations" doc:id="dae23e30-d851-4760-8bae-fd4c6fcf0e37" >
 		<db:select doc:name="Retrieve consultations" doc:id="e3812db9-a1aa-40a8-b2b2-2266bd0e0a94" config-ref="Database_Config">
@@ -49,8 +64,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</sub-flow>
 	<sub-flow name="sub-retrieve-medications" doc:id="a1016c32-3e82-474c-979e-cc63933c3c02" >
 		<db:select doc:name="Retrieve medications" doc:id="52983b88-6ccf-444b-91bc-0a3e9cd1d667" config-ref="Database_Config" target="medications">
-			<db:sql><![CDATA[SELECT]]></db:sql>
-			<db:input-parameters><![CDATA[#[{}]]]></db:input-parameters>
+			<db:sql><![CDATA[SELECT * FROM medications]]></db:sql>
 		</db:select>
 		<logger level="INFO" doc:name="After retrieve medications" doc:id="fd4745a4-8cb7-41db-a9c8-9ecd7b89c002" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve medications",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.patientId,&#10;        	medicationsCount: sizeOf(vars.medications)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}" />
 		<logger level="DEBUG" doc:name="Debug retrieve medications" doc:id="0e4cd61c-69d5-44c2-9251-a92c9d156630" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve medications",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstMedication: vars.medications[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
@@ -58,6 +72,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<sub-flow name="sub-check-prescriptions-allergens" doc:id="15d52f25-801b-49d6-9233-459576bb142a" >
 		<flow-ref doc:name="sub-retrieve-patient-allergies" doc:id="85c210fc-4735-4789-8e25-78204c85b7b2" name="sub-retrieve-patient-allergies"/>
 		<flow-ref doc:name="sub-retrieve-medications" doc:id="fe65bc36-c104-4c16-8e64-759eab24be63" name="sub-retrieve-medications"/>
-		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	'allergies': vars.patientAllergies,&#10;	'medications': vars.medications&#10;}]" doc:name="Set Payload" doc:id="081c42f3-fd12-4a50-a000-c7da42839a2a" />
+		<ee:transform doc:name="Patient is allergic to a medication" doc:id="1078934b-da5f-4f82-a1bf-d0e17d441222" >
+			<ee:message >
+				<ee:set-payload resource="modules/AllergyConflict.dwl" />
+			</ee:message>
+		</ee:transform>
+		<validation:is-false doc:name="Is false" doc:id="c4b24346-8ac6-4e59-b99b-18c248873cf6" expression="#[ payload ]">
+			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="PATIENT:BAD_REQUEST" />
+		</validation:is-false>
 	</sub-flow>
 </mule>
