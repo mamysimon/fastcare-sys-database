@@ -1,0 +1,15 @@
+%dw 2.0
+
+type auto_ac17df21_4213_450a_a64a_d5ff6364ae84_Input_Payload = {
+  dateTime: String, 
+  data: {
+    allergies: Array<{      createdAt: String,       allergenType: String,       severityLevel: String,       patientReference: String,       allergenName: String,       id: Number,       _?: Any    }>, 
+    consultations: Array<{      practitionerName: String,       bloodPressure?: String,       createdAt?: String,       clinincalNotes: String,       patientReference: String,       temperature?: Number,       visitDate: String,       reasonForVisit: String,       prescriptionsList?: String,       id?: Number,       _?: Any    }>, 
+    _?: Any
+  }, 
+  correlationId: String, 
+  message: String, 
+  statusCode: Number, 
+  _?: Any
+}
+

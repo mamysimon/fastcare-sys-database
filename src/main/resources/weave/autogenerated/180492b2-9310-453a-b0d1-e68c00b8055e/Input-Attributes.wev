@@ -1,0 +1,26 @@
+%dw 2.0
+
+type auto_180492b2_9310_453a_b0d1_e68c00b8055e_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {|
+    host: String, 
+    patientId: String
+  |}, 
+  version: String, 
+  localAddress: String
+|}
+

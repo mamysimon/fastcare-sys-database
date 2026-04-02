@@ -59,7 +59,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 			<flow-ref doc:name="genericError" doc:id="fbd47efc-711d-4dbe-8f51-2ea757bdf377" name="genericError"/>
 		</on-error-propagate> [STUDIO] -->
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="patient not found" doc:id="c0908d6e-3289-48cf-a0cf-95937cc0be7e" type="PATIENT:NOT_FOUND">
-			<set-variable value='#["Patient with id $(vars.id) not found"]' doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
+			<set-variable value='#["Patient with id $(vars.patientId) not found"]' doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
 			<set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />
 			<flow-ref doc:name="genericError" doc:id="c002c344-1a78-47dd-86aa-8df3c803169a" name="genericError" />
 		</on-error-propagate>
