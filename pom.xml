@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>43c948fb-024c-4176-a702-879840dedb82</groupId>
 			<artifactId>database-system-api</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>
