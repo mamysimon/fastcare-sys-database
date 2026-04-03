@@ -12,8 +12,6 @@
     <db:config name="Database_Config" doc:name="Database Config" doc:id="725c5caf-a0c5-431d-82c6-a8ea364a112f">
         <db:generic-connection url="jdbc:postgresql://${db.host}:${db.port}/${db.database}" user="${db.user}" password="${secure::db.password}" driverClassName="org.postgresql.Driver" />
     </db:config>
-    <global-property doc:name="Global Property" doc:id="bc4e5da8-464e-4e5a-8bd2-09181ee67f14" name="mule.env" value="loc" />
-    <global-property doc:name="Global Property" doc:id="0b8c0897-1776-4fad-a209-a14f204c1006" name="mule.encryptionKey" value="fastcarelocalkey" />
     <sub-flow name="genericError" doc:id="924dcda8-a5cf-46d3-b12f-a585751fea50">
         <set-variable value="#[error.errorType.identifier match {&#xA;  case &quot;BAD_REQUEST&quot;            -&gt; 400&#xA;  case &quot;UNAUTHORIZED&quot;           -&gt; 401&#xA;  case &quot;FORBIDDEN&quot;              -&gt; 403&#xA;  case &quot;NOT_FOUND&quot;              -&gt; 404&#xA;  case &quot;METHOD_NOT_ALLOWED&quot;     -&gt; 405&#xA;  case &quot;NOT_ACCEPTABLE&quot;         -&gt; 406&#xA;  case &quot;CONFLICT&quot;                -&gt; 409&#xA;  case &quot;UNSUPPORTED_MEDIA_TYPE&quot; -&gt; 415&#xA;  case &quot;NOT_IMPLEMENTED&quot;        -&gt; 501&#xA;  else                          -&gt; error.errorMessage.attributes.statusCode default vars.httpStatus default 500&#xA;}]" doc:name="[httpStatus]" doc:id="4166b7c9-1ee6-4b75-9170-df4821512c8c" variableName="httpStatus" />
         <ee:transform doc:name="Standard Error" doc:id="dd9dbbd1-1fd1-4607-b841-941fb8f9fe8a">
