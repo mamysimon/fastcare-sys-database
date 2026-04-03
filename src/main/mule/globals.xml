@@ -3,7 +3,7 @@
     <http:listener-config name="sys-database-api-httpListenerConfig" basePath="${application.base-path}">
         <http:listener-connection host="0.0.0.0" port="${https.port}" />
     </http:listener-config>
-    <apikit:config name="sys-database-api-config" api="resource::43c948fb-024c-4176-a702-879840dedb82:database-system-api:1.0.5:raml:zip:database-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" queryParamsStrictValidation="true" />
+    <apikit:config name="sys-database-api-config" api="resource::43c948fb-024c-4176-a702-879840dedb82:database-system-api:1.0.6:raml:zip:database-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" queryParamsStrictValidation="true" />
     <configuration-properties doc:name="Configuration common properties" doc:id="33c029f3-7ef6-4940-9415-818e44cf94ea" file="properties/common-properties.yaml" />
     <configuration-properties doc:name="Configuration properties" doc:id="a627d6e9-4446-4ab1-b556-586aacd7e204" file="properties/${mule.env}-properties.yaml" />
     <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="1fc53cbb-8f21-4945-8d9f-46178cd0b867" file="properties/secure/${mule.env}-properties.yaml" key="${mule.encryptionKey}" />
@@ -32,12 +32,12 @@
             <set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />
             <flow-ref doc:name="genericError" doc:id="c002c344-1a78-47dd-86aa-8df3c803169a" name="genericError" />
         </on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="patient is allergic to prescription" doc:id="0600008f-ed2b-45a9-9b5e-a6c8620c037b" type="PATIENT:BAD_REQUEST">
-			<set-variable value="#[&quot;The prescriptions do not match the patient's allergies&quot;]" doc:name="[description]" doc:id="fa6bb291-2a11-42e1-be3e-4ac4055c9341" variableName="description" />
-			<set-variable value="400" doc:name="[httpStatus]" doc:id="12a23b53-9bab-443b-b01f-494afbdfd085" variableName="httpStatus" />
-			<flow-ref doc:name="genericError" doc:id="1b8aecc4-82d6-4311-8fbd-9caa256b3142" name="genericError" />
-		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1647bce7-4967-4420-bb1b-91170148787d">
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="patient is allergic to prescription" doc:id="0600008f-ed2b-45a9-9b5e-a6c8620c037b" type="PATIENT:BAD_REQUEST">
+            <set-variable value="#[&quot;The prescriptions do not match the patient's allergies&quot;]" doc:name="[description]" doc:id="fa6bb291-2a11-42e1-be3e-4ac4055c9341" variableName="description" />
+            <set-variable value="400" doc:name="[httpStatus]" doc:id="12a23b53-9bab-443b-b01f-494afbdfd085" variableName="httpStatus" />
+            <flow-ref doc:name="genericError" doc:id="1b8aecc4-82d6-4311-8fbd-9caa256b3142" name="genericError" />
+        </on-error-propagate>
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1647bce7-4967-4420-bb1b-91170148787d">
             <flow-ref doc:name="genericError" doc:id="71506bee-a65b-44f6-9761-ed1c88dbc8cd" name="genericError" />
         </on-error-propagate>
     </error-handler>
