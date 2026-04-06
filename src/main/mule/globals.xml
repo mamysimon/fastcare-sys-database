@@ -22,11 +22,6 @@
         <logger level="ERROR" doc:name="ERROR" doc:id="a0833285-47dc-4907-a6cb-34855ee4c7dd" message="#[{&#xA; step: &quot;Global error handler&quot;,&#xA; data: {&#xA;  business: {},&#xA;  technical: payload&#xA; }&#xA;}]" category="${app.name}" />
     </sub-flow>
     <error-handler name="globalsError_Handler" doc:id="4e6c82c1-1022-4ce4-a607-fcd5f16f1aa5">
-        <!-- [STUDIO:"custom error"]<on-error-propagate enableNotifications="true" logException="true" doc:name="custom error" doc:id="caf48a9d-1676-4070-90f5-0037e83c959f" type="CUSTOM:ERROR">
-			<set-variable value="Set custom description here" doc:name="[description&#93;" doc:id="9f3795ff-423b-4099-90eb-0d90bbc59ab6" variableName="description"/>
-			<set-variable value="999" doc:name="[httpStatus&#93;" doc:id="a7cf9546-fdce-457e-ac00-43491bf349e8" variableName="httpStatus"/>
-			<flow-ref doc:name="genericError" doc:id="fbd47efc-711d-4dbe-8f51-2ea757bdf377" name="genericError"/>
-		</on-error-propagate> [STUDIO] -->
         <on-error-propagate enableNotifications="true" logException="true" doc:name="patient not found" doc:id="c0908d6e-3289-48cf-a0cf-95937cc0be7e" type="PATIENT:NOT_FOUND">
             <set-variable value="#[&quot;Patient with id $(vars.patientId) not found&quot;]" doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
             <set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />

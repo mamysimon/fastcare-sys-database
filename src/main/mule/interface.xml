@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <flow name="put:\records\(patientId):application\json:sys-database-api-config">
+        <set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="ddf8605b-82af-4091-bc42-4f8157cfa0bc" variableName="patientId" />
+        <set-variable value="#[payload]" doc:name="[consultation]" doc:id="15b784a2-f79d-4da4-92d2-cb6767408f15" variableName="consultation" />
+        <flow-ref doc:name="sub-add-consultation" doc:id="8f3fc8fd-eaa0-49a9-a827-a956488bff8b" name="sub-add-consultation" />
+        <set-payload value="#[null]" doc:name="null" doc:id="26f0f02f-f8f1-479a-a0f4-c22d5056bf9f" />
+    </flow>
+    <flow name="get:\patients\(id):sys-database-api-config">
+        <set-variable value="#[attributes.uriParams.id]" doc:name="[patientId]" doc:id="4d86b7a9-92f5-4d21-9750-fb69a24801a5" variableName="patientId" />
+        <flow-ref doc:name="sub-get-patient" doc:id="bc5e79df-e9a7-4209-8b28-2b4df197d246" name="sub-get-patient" />
+    </flow>
+    <flow name="get:\records\(patientId):sys-database-api-config">
+        <set-variable value="#[attributes.uriParams.patientId]" doc:name="[patientId]" doc:id="4f874388-d6d9-41f7-90d8-1e8e7b9d3f26" variableName="patientId" />
+        <flow-ref doc:name="sub-get-record" doc:id="c655a4eb-db6d-49e8-8e96-cb850f6ced3c" name="sub-get-medical-record" />
+    </flow>
+</mule>

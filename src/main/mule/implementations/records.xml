@@ -7,13 +7,13 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<sub-flow name="sub-get-medical-record" doc:id="ac17df21-4213-450a-a64a-d5ff6364ae84" >
-		<flow-ref doc:name="Patient exists" doc:id="5dab2be4-cc0f-4686-9f5e-4bed6b87e9c8" name="sub-get-patient"/>
+		<flow-ref doc:name="[Patient] exists" doc:id="5dab2be4-cc0f-4686-9f5e-4bed6b87e9c8" name="sub-get-patient" target="patient"/>
 		<flow-ref doc:name="sub-retrieve-patient-consultations" doc:id="7c8b580e-d685-4758-af47-b5106c65cf58" name="sub-retrieve-patient-consultations"/>
 		<flow-ref doc:name="sub-retrieve-patient-allergies" doc:id="17b8a5a7-1b4a-4d36-8b75-70b73cce640e" name="sub-retrieve-patient-allergies"/>
-		<set-payload value="#[{&#10;	'consultations': vars.patientConsultations,&#10;	'allergies': vars.patientAllergies&#10;}]" doc:name="Aggregate consultations and allergies" doc:id="a8ea6a0d-3934-4ac3-a175-9950a28c9b19" />
+		<set-payload value="#[{&#10;	'consultations': vars.consultationsCamelized,&#10;	'allergies': vars.allergiesCamelized&#10;}]" doc:name="Aggregate consultations and allergies" doc:id="a8ea6a0d-3934-4ac3-a175-9950a28c9b19" />
 	</sub-flow>
 	<sub-flow name="sub-add-consultation" doc:id="5991243e-4e2f-4993-8db9-02c0a22cced7">
-		<flow-ref doc:name="Patient exists" doc:id="94ceb294-0c33-4547-bc53-0cf022299a0b" name="sub-get-patient" />
+		<flow-ref doc:name="[Patient] exists" doc:id="94ceb294-0c33-4547-bc53-0cf022299a0b" name="sub-get-patient" target="patient"/>
 		<flow-ref doc:name="sub-check-prescriptions-allergens" doc:id="bab941e6-b1e1-407e-8842-36c93147b081" name="sub-check-prescriptions-allergens"/>
 		<db:insert doc:name="Add consultation" doc:id="f86855e8-0af0-4399-b15a-6ad775937e8f" config-ref="Database_Config">
 			<db:sql ><![CDATA[INSERT INTO consultations (patient_reference, practitioner_name, visit_date, reason_for_visit, clinical_notes, prescriptions_list, blood_pressure, temperature)
@@ -31,36 +31,44 @@ VALUES (:patientId, :practioner, :date, :reason, :notes, :prescription, :bloodPr
 		</db:insert>
 	</sub-flow>
 	<sub-flow name="sub-retrieve-patient-consultations" doc:id="dae23e30-d851-4760-8bae-fd4c6fcf0e37" >
-		<db:select doc:name="Retrieve consultations" doc:id="e3812db9-a1aa-40a8-b2b2-2266bd0e0a94" config-ref="Database_Config">
+		<db:select doc:name="Retrieve patient [consultations]" doc:id="e3812db9-a1aa-40a8-b2b2-2266bd0e0a94" config-ref="Database_Config" target="consultations">
 			<db:sql><![CDATA[SELECT * FROM consultations WHERE patient_reference = :patientId]]></db:sql>
 			<db:input-parameters><![CDATA[#[{'patientId': vars.patientId}]]]></db:input-parameters>
 		</db:select>
-		<logger level="INFO" doc:name="After retrieve consultations" doc:id="8167d40a-4277-4669-8139-131e1b401e75" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve consultations",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.patientId,&#10;        	consultationsCount: sizeOf(payload)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}" />
-		<logger level="DEBUG" doc:name="Debug retrieve consultations" doc:id="63e7bb56-c961-4d75-9179-e61edc5ff060" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve consultations",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstConsultation: payload[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="INFO" doc:name="After retrieve consultations" doc:id="8167d40a-4277-4669-8139-131e1b401e75" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve consultations",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.patientId,&#10;        	consultationsCount: sizeOf(vars.consultations)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="DEBUG" doc:name="Debug retrieve consultations" doc:id="63e7bb56-c961-4d75-9179-e61edc5ff060" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve consultations",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstConsultation: vars.consultations[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
 		<ee:transform doc:name="Camelize keys" doc:id="ffebe233-1cf9-41ca-83a4-138719c9b114" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable resource="modules/CamelizeKeys.dwl" variableName="patientConsultations" />
+				<ee:set-variable variableName="consultationsCamelized" ><![CDATA[%dw 2.0
+import * from modules::CamelizeKeys
+output application/json
+---
+camelizeData(vars.consultations)]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<logger level="DEBUG" doc:name="Debug camelize keys" doc:id="3124f47d-4d3b-49d8-96af-2b30ef0d9aca" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug camelize keys",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstConsultation: vars.patientConsultations[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="DEBUG" doc:name="Debug camelize keys" doc:id="3124f47d-4d3b-49d8-96af-2b30ef0d9aca" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug camelize keys",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstConsultation: vars.consultationsCamelized[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
 	</sub-flow>
 	<sub-flow name="sub-retrieve-patient-allergies" doc:id="180492b2-9310-453a-b0d1-e68c00b8055e" >
-		<db:select doc:name="Retrieve allergies" doc:id="a7010649-89a7-49d1-a7bb-373ef26feceb" config-ref="Database_Config">
+		<db:select doc:name="Retrieve patient allergies" doc:id="a7010649-89a7-49d1-a7bb-373ef26feceb" config-ref="Database_Config" target="allergies">
 			<db:sql><![CDATA[SELECT * FROM patients_allergies WHERE patient_reference = :patientId]]></db:sql>
 			<db:input-parameters><![CDATA[#[{'patientId': vars.patientId}]]]></db:input-parameters>
 		</db:select>
-		<logger level="INFO" doc:name="After retrieve allergies" doc:id="40cbeb84-4b7a-4e0b-ab41-6e2ffe6276ba" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve allergies",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.patientId,&#10;        	allergiesCount: sizeOf(payload)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}" />
-		<logger level="DEBUG" doc:name="Debug retrieve allergies" doc:id="541c17ea-d76e-4bfd-9a3d-59fcdf04af21" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve allergies",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstAllergie: payload[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="INFO" doc:name="After retrieve allergies" doc:id="40cbeb84-4b7a-4e0b-ab41-6e2ffe6276ba" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    step: "After retrieve allergies",&#10;    data: {&#10;        business: {&#10;        	patientId: vars.patientId,&#10;        	allergiesCount: sizeOf(vars.allergies)&#10;        },&#10;        technical: {}&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="DEBUG" doc:name="Debug retrieve allergies" doc:id="541c17ea-d76e-4bfd-9a3d-59fcdf04af21" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug retrieve allergies",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstAllergie: vars.allergies[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
 		<ee:transform doc:name="Camelize keys" doc:id="bb286925-0ca8-4d55-b361-670509adccfd" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable resource="modules/CamelizeKeys.dwl" variableName="patientAllergies" />
+				<ee:set-variable variableName="allergiesCamelized" ><![CDATA[%dw 2.0
+import * from modules::CamelizeKeys
+output application/json
+---
+camelizeData(vars.allergies)]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<logger level="DEBUG" doc:name="Debug camelize keys" doc:id="9490d40c-20f4-412d-9755-9c0b01b2cc1d" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug camelize keys",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstAllergie: vars.patientAllergies[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
+		<logger level="DEBUG" doc:name="Debug camelize keys" doc:id="9490d40c-20f4-412d-9755-9c0b01b2cc1d" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug camelize keys",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	firstAllergie: vars.allergiesCamelized[0]&#10;        }&#10;    }&#10;}]' category="${app.name}" />
 	</sub-flow>
 	<sub-flow name="sub-retrieve-medications" doc:id="a1016c32-3e82-474c-979e-cc63933c3c02" >
 		<db:select doc:name="Retrieve medications" doc:id="52983b88-6ccf-444b-91bc-0a3e9cd1d667" config-ref="Database_Config" target="medications">
@@ -72,13 +80,15 @@ VALUES (:patientId, :practioner, :date, :reason, :notes, :prescription, :bloodPr
 	<sub-flow name="sub-check-prescriptions-allergens" doc:id="15d52f25-801b-49d6-9233-459576bb142a" >
 		<flow-ref doc:name="sub-retrieve-patient-allergies" doc:id="85c210fc-4735-4789-8e25-78204c85b7b2" name="sub-retrieve-patient-allergies"/>
 		<flow-ref doc:name="sub-retrieve-medications" doc:id="fe65bc36-c104-4c16-8e64-759eab24be63" name="sub-retrieve-medications"/>
-		<ee:transform doc:name="Patient is allergic to a medication" doc:id="1078934b-da5f-4f82-a1bf-d0e17d441222" >
+		<ee:transform doc:name="Check [allergyConflict]" doc:id="1078934b-da5f-4f82-a1bf-d0e17d441222" >
 			<ee:message >
-				<ee:set-payload resource="modules/AllergyConflict.dwl" />
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="modules/AllergyConflict.dwl" variableName="allergyConflict" />
+			</ee:variables>
 		</ee:transform>
-		<logger level="DEBUG" doc:name='Debug patient allergies conflict"' doc:id="6e422856-904f-4080-8f05-aa5440ea807f" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug patient allergies conflict",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	allergyConflict: payload&#10;        }&#10;    }&#10;}]' category="${app.name}"/>
-		<validation:is-false doc:name="Is false" doc:id="c4b24346-8ac6-4e59-b99b-18c248873cf6" expression="#[ payload ]">
+		<logger level="DEBUG" doc:name='Debug patient allergy conflict"' doc:id="6e422856-904f-4080-8f05-aa5440ea807f" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug patient allergy conflict",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	allergyConflict: vars.allergyConflict&#10;        }&#10;    }&#10;}]' category="${app.name}"/>
+		<validation:is-false doc:name="Is [allergyConflict] false" doc:id="c4b24346-8ac6-4e59-b99b-18c248873cf6" expression="#[ vars.allergyConflict ]">
 			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="PATIENT:BAD_REQUEST" />
 		</validation:is-false>
 	</sub-flow>
