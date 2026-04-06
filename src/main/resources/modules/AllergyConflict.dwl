@@ -1,6 +1,6 @@
 %dw 2.0
 output application/json
-var patientAllergies = vars.patientAllergies map $.allergenName
+var patientAllergies = vars.allergiesCamelized map $.allergenName
 var medsMatchingPatientAllergies = vars.medications filter ((med) -> patientAllergies contains med.active_substance) map $.brand_name
 var prescriptions = splitBy(vars.consultation.prescriptionsList, ", ")
 ---
