@@ -23,12 +23,12 @@
     </sub-flow>
     <error-handler name="globalsError_Handler" doc:id="4e6c82c1-1022-4ce4-a607-fcd5f16f1aa5">
         <on-error-propagate enableNotifications="true" logException="true" doc:name="patient not found" doc:id="c0908d6e-3289-48cf-a0cf-95937cc0be7e" type="PATIENT:NOT_FOUND">
-            <set-variable value="#[&quot;Patient with id $(vars.patientId) not found&quot;]" doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
+            <set-variable value='#["Patient with id $(vars.patientId) not found."]' doc:name="[description]" doc:id="dca056e6-44bb-495f-ae7f-6919776429b2" variableName="description" />
             <set-variable value="404" doc:name="[httpStatus]" doc:id="40cfd40d-4ea8-481a-8ab3-8c06e10129d9" variableName="httpStatus" />
             <flow-ref doc:name="genericError" doc:id="c002c344-1a78-47dd-86aa-8df3c803169a" name="genericError" />
         </on-error-propagate>
         <on-error-propagate enableNotifications="true" logException="true" doc:name="patient is allergic to prescription" doc:id="0600008f-ed2b-45a9-9b5e-a6c8620c037b" type="PATIENT:BAD_REQUEST">
-            <set-variable value="#[&quot;The prescriptions do not match the patient's allergies&quot;]" doc:name="[description]" doc:id="fa6bb291-2a11-42e1-be3e-4ac4055c9341" variableName="description" />
+            <set-variable value="#[&quot;The prescriptions do not match the patient's allergies.&quot;]" doc:name="[description]" doc:id="fa6bb291-2a11-42e1-be3e-4ac4055c9341" variableName="description" />
             <set-variable value="400" doc:name="[httpStatus]" doc:id="12a23b53-9bab-443b-b01f-494afbdfd085" variableName="httpStatus" />
             <flow-ref doc:name="genericError" doc:id="1b8aecc4-82d6-4311-8fbd-9caa256b3142" name="genericError" />
         </on-error-propagate>
