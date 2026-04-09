@@ -1,10 +1,10 @@
 ################################
 # API Manager
-autodiscoveryId: "000000"
+autodiscoveryId: "20835977"
 
 # Listener
 https:
-  port: "8081"
+  port: "443"
 ################################
 
 db:
