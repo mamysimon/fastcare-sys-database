@@ -89,7 +89,7 @@ camelizeData(vars.allergies)]]></ee:set-variable>
 		</ee:transform>
 		<logger level="DEBUG" doc:name='Debug patient allergy conflict"' doc:id="6e422856-904f-4080-8f05-aa5440ea807f" message='#[%dw 2.0&#10;output application/json indent=false&#10;---&#10;{&#10;    step: "Debug patient allergy conflict",&#10;    data: {&#10;        business: {},&#10;        technical: {&#10;        	allergyConflict: vars.allergyConflict&#10;        }&#10;    }&#10;}]' category="${app.name}"/>
 		<validation:is-false doc:name="Is [allergyConflict] false" doc:id="c4b24346-8ac6-4e59-b99b-18c248873cf6" expression="#[ vars.allergyConflict ]">
-			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="PATIENT:BAD_REQUEST" />
+			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="PATIENT:CONFLICT" />
 		</validation:is-false>
 	</sub-flow>
 </mule>
